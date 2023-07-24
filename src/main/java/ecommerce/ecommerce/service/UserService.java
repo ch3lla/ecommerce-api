@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -33,6 +34,29 @@ public class UserService {
             throw new IllegalStateException("User already exists");
         }
         return userRepository.save(user);
+    }
+
+    public User updateUser(ObjectId id, User updatedUser) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser == null) {
+            throw new IllegalStateException("User does not exist");
+        }
+
+        // Update only the specified fields
+        if (updatedUser.getEmail() != null) {
+            existingUser.setEmail(updatedUser.getEmail());
+        }
+        if (updatedUser.getUsername() != null) {
+            existingUser.setUsername(updatedUser.getUsername());
+        }
+        if (updatedUser.getAddress() != null) {
+            existingUser.setAddress(updatedUser.getAddress());
+        }
+        if (updatedUser.getPassword() != null) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
+
+        return userRepository.save(existingUser);
     }
 
     public void deleteUser(ObjectId id){
