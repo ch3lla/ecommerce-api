@@ -20,13 +20,27 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private MongoTemplate mongoTemplate;
-    public User createUser(User user){
-        return userRepository.save(user);
-    }
 
     public List<User> allUsers () {
         return userRepository.findAll();
     }
+
     public Optional<User> findById(ObjectId id){ return userRepository.findById(id); }
+
+    public User createUser(User user){
+        Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(user.getUsername()));
+        if (userOptional.isPresent()){
+            throw new IllegalStateException("User already exists");
+        }
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(ObjectId id){
+        boolean exists = userRepository.existsById(id);
+        if(!exists){
+            throw new IllegalStateException("User with id " + id + " does not exist");
+        }
+        userRepository.deleteById(id);
+    }
 
 }
